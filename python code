@@ -1,0 +1,36 @@
+!pip install --upgrade transformers # installs the module
+
+#import the requeired modules
+import transformers
+print(transformers.__version__)
+
+#import required files
+import librosa
+import torch
+import IPython.display as display
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
+import numpy as np
+
+#Load pre-trained Wav2Vec model
+tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
+model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+
+#input the audio file with the clear dialogue sentence
+audio, sampling_rate = librosa.load("../input/audio-dataset/Voice 002.m4a",sr=16000)
+
+#check with the value notes.
+input_values = tokenizer(audio, return_tensors = 'pt').input_values
+input_values
+
+#check the logits
+logits = model(input_values).logits
+logits
+
+#check the notes and read the audio with the help of module 
+predicted_ids = torch.argmax(logits, dim =-1)
+
+#Assign the output text to a variable
+transcriptions = tokenizer.decode(predicted_ids[0])
+
+#print the output text
+transcriptions                                    
